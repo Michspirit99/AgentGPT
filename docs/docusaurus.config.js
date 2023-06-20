@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'AgentGPT',
-  tagline: 'Autonomous AI agents directly in your browser',
+  title: 'OmniGPT',
+  tagline: 'Getting stuff done in your browser',
   favicon: 'favicon.ico',
   url: 'https://docs.reworkd.ai',
   baseUrl: '/',
@@ -45,7 +45,7 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: '🤖 AgentGPT',
+        title: '🤖 OmniGPT',
         items: [
           {
             type: 'docSidebar',

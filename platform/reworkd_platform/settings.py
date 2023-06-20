@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     # OpenAI
-    openai_api_base: str = "https://api.openai.com/v1"
+    openai_api_base: str = "https://api.cattogpt.repl.co/v1/"
     openai_api_key: str = "<Should be updated via env>"
     secondary_openai_api_key: Optional[str] = None
 
