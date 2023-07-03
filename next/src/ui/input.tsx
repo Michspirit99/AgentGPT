@@ -1,20 +1,15 @@
 import React from "react";
 
-interface Props {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  value: string | number | readonly string[] | undefined;
   name: string;
-  type: string;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>
-  ) => void;
   attributes?: { [key: string]: string | number | string[] };
   helpText?: string | React.ReactNode;
-  placeholder?: string;
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
-const Input = ({ ...props }: Props) => {
+const Input = (props: Props) => {
   return (
     <div>
       <label
@@ -24,13 +19,15 @@ const Input = ({ ...props }: Props) => {
         <span>{props.label}</span>
         {props.icon}
         {props.type == "range" && (
-          <span className="text-xs font-thin text-gray-300 lg:text-sm">({props.value})</span>
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-400 lg:text-sm">
+            ({props.value})
+          </span>
         )}
       </label>
       <div className="relative flex flex-col gap-1 rounded-md shadow-sm">
         {props.helpText && (
           <p
-            className="text-xs font-thin text-gray-500 dark:text-gray-400 lg:text-sm"
+            className="text-xs font-thin text-gray-900 dark:text-gray-400 lg:text-sm"
             id={`${props.name}-description`}
           >
             {props.helpText}
@@ -44,6 +41,7 @@ const Input = ({ ...props }: Props) => {
           placeholder={props.placeholder}
           value={props.value}
           onChange={props.onChange}
+          disabled={props.disabled}
           {...(props.helpText ? { "aria-describedby": `${props.name}-description` } : {})}
           {...props.attributes}
         />

@@ -12,12 +12,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.96.0"
+fastapi = "^0.98.0"
 uvicorn = { version = "^0.22.0", extras = ["standard"] }
 pydantic = { version = "^1.10.8", extras = ["dotenv"] }
 yarl = "^1.9.2"
 ujson = "^5.7.0"
-SQLAlchemy = { version = "^2.0.15", extras = ["asyncio"] }
+sqlalchemy = {version = "^2.0.17", extras = ["mypy", "asyncio"]}
 aiomysql = "^0.1.1"
 mysqlclient = "^2.1.1"
 httptools = "^0.5.0"
@@ -50,12 +50,13 @@ black = "^23.3.0"
 autoflake = "^2.1.1"
 pytest-cov = "^4.1.0"
 anyio = "^3.7.0"
-pytest-env = "^0.8.1"
+pytest-env = "^0.8.2"
 taskiq = { version = "^0.6.0", extras = ["reload"] }
 
 [tool.poetry.group.dev.dependencies]
 pytest-mock = "^3.10.0"
 httpx = "^0.24.1"
+pytest-asyncio = "^0.21.0"
 
 [tool.isort]
 profile = "black"
@@ -63,6 +64,8 @@ multi_line_output = 3
 src_paths = ["reworkd_platform", ]
 
 [tool.mypy]
+# https://docs.sqlalchemy.org/en/20/orm/extensions/mypy.html TODO: enable this if tying issues happen with SQLA
+# plugins = ["sqlalchemy.ext.mypy.plugin"]
 strict = true
 ignore_missing_imports = true
 allow_subclassing_any = true
@@ -81,6 +84,7 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
     "ignore:.*unclosed.*:ResourceWarning",
+    "ignore::ImportWarning",
 ]
 env = [
     "REWORKD_PLATFORM_ENVIRONMENT=pytest",
