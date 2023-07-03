@@ -26,7 +26,7 @@ LLM_MODEL_MAX_TOKENS: Dict[LLM_Model, int] = {
 
 
 class ModelSettings(BaseModel):
-    model: LLM_Model = Field(default="gpt-3.5-turbo")
+    model: LLM_Model = Field(default="gpt-3.5-turbo-16k")
     custom_api_key: Optional[str] = Field(default=None)
     temperature: float = Field(default=0.9, ge=0.0, le=1.0)
     max_tokens: int = Field(default=500, ge=0)
