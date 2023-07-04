@@ -1,13 +1,14 @@
-from typing import Any, Callable, Coroutine, TypeVar
+from typing import TypeVar
 
 from fastapi import Body, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from reworkd_platform.db.crud import AgentCRUD
+from reworkd_platform.db.crud.agent import AgentCRUD
 from reworkd_platform.db.dependencies import get_db_session
 from reworkd_platform.schemas import (
     AgentRun,
     AgentRunCreate,
+    AgentSummarize,
     AgentTaskAnalyze,
     AgentTaskCreate,
     AgentTaskExecute,
@@ -24,7 +25,7 @@ from reworkd_platform.web.api.memory.memory_with_fallback import MemoryWithFallb
 from reworkd_platform.web.api.memory.null import NullAgentMemory
 from reworkd_platform.web.api.memory.weaviate import WeaviateMemory
 
-T = TypeVar("T", AgentTaskAnalyze, AgentTaskExecute, AgentTaskCreate)
+T = TypeVar("T", AgentTaskAnalyze, AgentTaskExecute, AgentTaskCreate, AgentSummarize)
 
 
 def agent_crud(
@@ -53,56 +54,60 @@ def get_agent_memory(
         return NullAgentMemory()
 
 
-def agent_start_validator(
-    **kwargs: Any,
-) -> Callable[[AgentRunCreate, AgentCRUD], Coroutine[Any, Any, AgentRunCreate]]:
-    async def func(
-        body: AgentRunCreate = Body(**kwargs),
-        crud: AgentCRUD = Depends(agent_crud),
-    ) -> AgentRun:
-        id_ = (await crud.create_run(body.goal)).id
-        return AgentRun(**body.dict(), run_id=str(id_))
+async def agent_start_validator(
+    body: AgentRunCreate = Body(
+        example={
+            "goal": "Create business plan for a bagel company",
+            "modelSettings": {
+                "customModelName": "gpt-3.5-turbo-16k",
+            },
+        },
+    ),
+    crud: AgentCRUD = Depends(agent_crud),
+) -> AgentRun:
+    id_ = (await crud.create_run(body.goal)).id
+    return AgentRun(**body.dict(), run_id=str(id_))
 
-    return func
 
-
-async def validate(body: T, crud: AgentCRUD, type_: Loop_Step):
+async def validate(body: T, crud: AgentCRUD, type_: Loop_Step) -> T:
     _id = (await crud.create_task(body.run_id, type_)).id
     body.run_id = str(_id)
     return body
 
 
-def agent_analyze_validator(
-    **kwargs: Any,
-) -> Callable[[AgentTaskAnalyze, AgentCRUD], Coroutine[Any, Any, AgentTaskAnalyze]]:
-    async def func(
-        body: AgentTaskAnalyze = Body(**kwargs),
-        crud: AgentCRUD = Depends(agent_crud),
-    ) -> AgentTaskAnalyze:
-        return await validate(body, crud, "analyze")
-
-    return func
+async def agent_analyze_validator(
+    body: AgentTaskAnalyze = Body(),
+    crud: AgentCRUD = Depends(agent_crud),
+) -> AgentTaskAnalyze:
+    return await validate(body, crud, "analyze")
 
 
-def agent_execute_validator(
-    **kwargs: Any,
-) -> Callable[[AgentTaskExecute, AgentCRUD], Coroutine[Any, Any, AgentTaskExecute]]:
-    async def func(
-        body: AgentTaskExecute = Body(**kwargs),
-        crud: AgentCRUD = Depends(agent_crud),
-    ) -> AgentTaskExecute:
-        return await validate(body, crud, "execute")
+async def agent_execute_validator(
+    body: AgentTaskExecute = Body(
+        example={
+            "goal": "Perform tasks accurately",
+            "task": "Write code to make a platformer",
+            "analysis": {
+                "reasoning": "I like to write code.",
+                "action": "code",
+                "arg": "",
+            },
+        },
+    ),
+    crud: AgentCRUD = Depends(agent_crud),
+) -> AgentTaskExecute:
+    return await validate(body, crud, "execute")
 
-    return func
+
+async def agent_create_validator(
+    body: AgentTaskCreate = Body(),
+    crud: AgentCRUD = Depends(agent_crud),
+) -> AgentTaskCreate:
+    return await validate(body, crud, "create")
 
 
-def agent_create_validator(
-    **kwargs: Any,
-) -> Callable[[AgentTaskCreate, AgentCRUD], Coroutine[Any, Any, AgentTaskCreate]]:
-    async def func(
-        body: AgentTaskCreate = Body(**kwargs),
-        crud: AgentCRUD = Depends(agent_crud),
-    ) -> AgentTaskCreate:
-        return await validate(body, crud, "create")
-
-    return func
+async def agent_summarize_validator(
+    body: AgentSummarize = Body(),
+    crud: AgentCRUD = Depends(agent_crud),
+) -> AgentSummarize:
+    return await validate(body, crud, "summarize")
