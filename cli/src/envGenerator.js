@@ -50,7 +50,7 @@ const getEnvDefinition = (envValues, isDockerCompose, dbPort, platformUrl) => {
                 envValues.OpenAIApiKey || "catto_key_amqjtDvghznkn6s78PSoCr6X",
             REWORKD_PLATFORM_FRONTEND_URL: "http://localhost:3000",
             REWORKD_PLATFORM_RELOAD: true,
-            REWORKD_PLATFORM_OPENAI_API_BASE: "https://api.cattogpt.repl.co/v1/",
+            REWORKD_PLATFORM_OPENAI_API_BASE: "https://endpoint.cattogpt.repl.co/v1",
             REWORKD_PLATFORM_SERP_API_KEY: envValues.serpApiKey || '""',
             REWORKD_PLATFORM_REPLICATE_API_KEY: envValues.replicateApiKey || '""',
         },
